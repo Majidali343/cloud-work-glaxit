@@ -98,22 +98,66 @@ public class Maslama2App implements RequestHandler<S3Event, String> {
         }
     }
 
-    private void processTxtContent(String content, Context context) {
-        // Parse TXT content and insert records into DynamoDB
-        String[] records = content.split(";");
-        for (String record : records) {
-            try {
-                String[] attributes = record.split(",");
-                String productName = attributes[0].split(":")[1].trim();
-                double price = Double.parseDouble(attributes[1].split(":")[1].trim());
-                String review = attributes[2].split(":")[1].trim();
-                double rating = Double.parseDouble(attributes[3].split(":")[1].trim());
-                insertRecord(productName, price, review, rating);
-                context.getLogger().log("Inserted TXT record: " + record);
-            } catch (Exception e) {
-                context.getLogger().log("Error processing TXT record: " + e.getMessage());
-                context.getLogger().log("Record: " + record);
+   private void processTxtContent(String content, Context context) {
+    // Parse TXT content and insert records into DynamoDB
+    String[] records = content.split(";");
+    for (String record : records) {
+        try {
+            // Split each record by ", " to handle the fields
+            String[] attributes = record.split(", (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+            
+            String productName = null;
+            double price = 0;
+            StringBuilder review = new StringBuilder();
+            double rating = 0;
+
+            for (String attribute : attributes) {
+                String[] keyValue = attribute.split(":");
+                if (keyValue.length < 2) {
+                    continue; // skip malformed attribute
+                }
+                String key = keyValue[0].trim();
+                String value = keyValue[1].trim();
+                
+                switch (key) {
+                    case "ProductName":
+                        productName = value;
+                        break;
+                    case "Price":
+                        price = Double.parseDouble(value);
+                        break;
+                    case "Review":
+                        review.append(value);
+                        break;
+                    case "Rating":
+                        rating = Double.parseDouble(value);
+                        break;
+                    default:
+                        // For handling commas in review
+                        review.append(", ").append(key).append(":").append(value);
+                }
+                context.getLogger().log("Attribute: " + attribute);
             }
+
+            if (productName != null && review.length() > 0) {
+                insertRecord(productName, price, review.toString(), rating);
+                context.getLogger().log("Inserted TXT record: " + record);
+            } else {
+                context.getLogger().log("Error processing TXT record: empty String");
+            }
+        } catch (Exception e) {
+            context.getLogger().log("Error processing TXT record: " + e.getMessage());
+            context.getLogger().log("Record: " + record);
+        }
+    }
+}
+
+
+    private String getValue(String attribute) {
+        try {
+            return attribute.split(":")[1].trim();
+        } catch (Exception e) {
+            return "";
         }
     }
 
