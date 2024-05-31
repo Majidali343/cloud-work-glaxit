@@ -26,20 +26,20 @@ public class Maslama2App implements RequestHandler<S3Event, String> {
     private String LOG_FILE_PATH = "/tmp/upload_log.txt"; // Temp directory for AWS Lambda
 
     public Maslama2App() {
-        // Initialize DynamoDB client
+        // i ma initilazing DynamoDB Client
         AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().build();
         this.dynamoDB = new DynamoDB(client);
     }
 
     @Override
     public String handleRequest(S3Event event, Context context) {
-        // Get bucket name and object key from the event
+        // i am getting the bucket name and object key from the event
         String bucketName = event.getRecords().get(0).getS3().getBucket().getName();
         String objectKey = event.getRecords().get(0).getS3().getObject().getKey();
         
         context.getLogger().log("Bucket: " + bucketName + " Key: " + objectKey);
 
-        // Log the bucket and file names
+        // Log the bucket and file names as per requiremnet
         logBucketAndFileName(bucketName, objectKey, context);
 
         // Get the S3 object
