@@ -1,0 +1,3 @@
+ProductName: Sony TV, Price: 12000, Review: I loved this product, have been using for 5 years, no issue, Rating: 4.85;
+ProductName: Bravia Microwave, Price: 350, Review: Good value, does the job, Rating: 4.12;
+ProductName: Lenovo Thinpad, Price: 2400, Review: Not happy with, had to return, Rating: 2.45;

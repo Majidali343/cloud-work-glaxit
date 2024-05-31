@@ -1,0 +1,115 @@
+[
+  {
+    "Action": {
+      "Operation": "FILL_WITH_AVERAGE",
+      "Parameters": {
+        "sourceColumn": "trip_distance"
+      }
+    }
+  },
+  {
+    "Action": {
+      "Operation": "FILL_WITH_AVERAGE",
+      "Parameters": {
+        "sourceColumn": "passenger_count"
+      }
+    }
+  },
+  {
+    "Action": {
+      "Operation": "FILL_WITH_AVERAGE",
+      "Parameters": {
+        "sourceColumn": "fare_amount"
+      }
+    }
+  },
+  {
+    "Action": {
+      "Operation": "FLAG_DUPLICATE_ROWS",
+      "Parameters": {
+        "duplicateRowsCount": "0",
+        "falseString": "0",
+        "targetColumn": "is_duplicate",
+        "trueString": "1"
+      }
+    }
+  },
+  {
+    "Action": {
+      "Operation": "FLAG_OUTLIERS",
+      "Parameters": {
+        "falseString": "0",
+        "outlierStrategy": "Z_SCORE",
+        "sourceColumn": "fare_amount",
+        "targetColumn": "is_outlier_fare",
+        "threshold": "3",
+        "trueString": "1"
+      }
+    }
+  },
+  {
+    "Action": {
+      "Operation": "FLAG_OUTLIERS",
+      "Parameters": {
+        "falseString": "0",
+        "outlierStrategy": "Z_SCORE",
+        "sourceColumn": "trip_distance",
+        "targetColumn": "is_outlier_distance",
+        "threshold": "3",
+        "trueString": "1"
+      }
+    }
+  },
+  {
+    "Action": {
+      "Operation": "WEEK_DAY",
+      "Parameters": {
+        "dateTimeFormat": "yyyy-mm-dd*HH:MM:SS",
+        "functionStepType": "WEEK_DAY",
+        "sourceColumn": "lpep_pickup_datetime",
+        "targetColumn": "weekday fare"
+      }
+    }
+  },
+  {
+    "Action": {
+      "Operation": "GROUP_BY",
+      "Parameters": {
+        "groupByAggFunctionOptions": "[{\"sourceColumnName\":\"fare_amount\",\"targetColumnName\":\"fare_amount_sum\",\"targetColumnDataType\":\"double\",\"functionName\":\"SUM\"}]",
+        "sourceColumns": "[\"weekday fare\"]",
+        "useNewDataFrame": "false"
+      }
+    }
+  },
+  {
+    "Action": {
+      "Operation": "GROUP_BY",
+      "Parameters": {
+        "groupByAggFunctionOptions": "[{\"sourceColumnName\":\"weekday fare\",\"targetColumnName\":\"weekday fare_count\",\"functionName\":\"COUNT\",\"targetColumnDataType\":\"int\"}]",
+        "sourceColumns": "[\"weekday fare\"]",
+        "useNewDataFrame": "false"
+      }
+    }
+  },
+  {
+    "Action": {
+      "Operation": "MONTH",
+      "Parameters": {
+        "dateTimeFormat": "yyyy-mm-dd*HH:MM:SS",
+        "functionStepType": "MONTH",
+        "sourceColumn": "lpep_pickup_datetime",
+        "targetColumn": "monthly"
+      }
+    }
+  },
+  {
+    "Action": {
+      "Operation": "GROUP_BY",
+      "Parameters": {
+        "groupByAggFunctionOptions": "[{\"sourceColumnName\":\"monthly\",\"targetColumnName\":\"monthly_count\",\"targetColumnDataType\":\"int\",\"functionName\":\"COUNT\"}]",
+        "sourceColumns": "[\"monthly\"]",
+        "useNewDataFrame": "false"
+      }
+    }
+  }
+]
